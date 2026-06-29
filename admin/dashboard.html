@@ -1,355 +1,323 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <title>Dashboard · Petit Spa</title>
-  <link rel="stylesheet" href="../styles.css" />
-  <style>
-    body { display: flex; }
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap');
 
-    .resumen-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-    .resumen-card {
-      background: var(--blanco);
-      border: 1px solid var(--detalle);
-      border-radius: var(--radio-lg);
-      padding: 20px 22px;
-      position: relative;
-      overflow: hidden;
-    }
-    .resumen-card::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(to right, var(--dorado), var(--dorado-claro));
-      opacity: 0.6;
-    }
-    .resumen-label {
-      font-size: 10px; font-weight: 500;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--dorado); margin-bottom: 10px;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .resumen-label svg { width: 13px; height: 13px; }
-    .resumen-numero {
-      font-family: var(--serif);
-      font-size: 44px; font-weight: 300; line-height: 1;
-      margin-bottom: 4px;
-    }
-    .resumen-sub { font-size: 11px; color: var(--texto-suave); }
+:root {
+  --dorado:       #C9A84C;
+  --dorado-osc:   #A8872E;
+  --dorado-bg:    #FBF6EC;
+  --dorado-light: #F5EDD6;
+  --fondo:        #F7F5F2;
+  --blanco:       #FFFFFF;
+  --texto:        #1A1814;
+  --texto-2:      #6B6560;
+  --texto-3:      #B0AAA3;
+  --borde:        #EBEBEB;
+  --error:        #E53935;
+  --exito:        #2E7D32;
+  --pendiente:    #E65100;
+  --serif:        'Playfair Display', Georgia, serif;
+  --sans:         'Inter', system-ui, sans-serif;
+  --sidebar-w:    72px;
+  --bottom-h:     72px;
+  --radio:        14px;
+  --radio-lg:     20px;
+  --radio-xl:     28px;
+}
 
-    .citas-wrap { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 400;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+input, button, select, textarea { font-family: var(--sans); }
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+input[type="date"], input[type="time"] { -webkit-appearance: none; }
 
-    .citas-lista { display: flex; flex-direction: column; gap: 8px; }
-    .cita-card {
-      background: var(--blanco);
-      border: 1px solid var(--detalle);
-      border-radius: var(--radio-lg);
-      padding: 14px 18px;
-      display: grid;
-      grid-template-columns: 56px 1fr auto;
-      gap: 14px;
-      align-items: center;
-      transition: box-shadow 0.15s, border-color 0.15s;
-    }
-    .cita-card:hover { box-shadow: var(--sombra); border-color: var(--acento); }
-    .cita-hora-box {
-      background: var(--fondo);
-      border: 1px solid var(--detalle);
-      border-radius: var(--radio);
-      padding: 8px 4px;
-      text-align: center;
-    }
-    .cita-hora { font-family: var(--serif); font-size: 20px; font-weight: 300; line-height: 1; }
-    .cita-hora-sub { font-size: 9px; color: var(--texto-suave); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
-    .cita-info h3 { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
-    .cita-info-sub { font-size: 11px; color: var(--texto-suave); margin-bottom: 5px; }
-    .cita-acciones { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
-    .btn-conf {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: rgba(39,174,96,0.1); color: var(--exito);
-      border: 1px solid rgba(39,174,96,0.2);
-      font-family: var(--sans); font-size: 11px; font-weight: 500;
-      padding: 5px 10px; border-radius: 999px; cursor: pointer;
-      transition: background 0.15s; white-space: nowrap;
-    }
-    .btn-conf:hover { background: rgba(39,174,96,0.18); }
-    .btn-conf svg { width: 11px; height: 11px; }
-    .btn-canc {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: transparent; color: var(--error);
-      border: 1px solid rgba(192,57,43,0.2);
-      font-family: var(--sans); font-size: 11px; font-weight: 500;
-      padding: 5px 10px; border-radius: 999px; cursor: pointer;
-      transition: background 0.15s; white-space: nowrap;
-    }
-    .btn-canc:hover { background: rgba(192,57,43,0.06); }
-    .btn-canc svg { width: 11px; height: 11px; }
+/* ══ SIDEBAR ══ */
+.sidebar {
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: var(--texto);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 100;
+  padding: 20px 0 16px;
+}
+.sidebar-logo {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(201,168,76,0.5);
+  margin-bottom: 32px;
+  flex-shrink: 0;
+}
+.sidebar-logo img { width: 100%; height: 100%; object-fit: cover; }
+.sidebar-nav {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 6px;
+  list-style: none; width: 100%;
+}
+.sidebar-nav li { width: 100%; display: flex; justify-content: center; position: relative; }
+.sidebar-nav li a {
+  width: 46px; height: 46px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radio);
+  color: rgba(255,255,255,0.35);
+  transition: all 0.2s;
+}
+.sidebar-nav li a svg { width: 22px; height: 22px; }
+.sidebar-nav li a:hover { color: var(--dorado); background: rgba(201,168,76,0.1); }
+.sidebar-nav li a.activo { color: var(--dorado); background: rgba(201,168,76,0.15); }
+.sidebar-nav li a.activo::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 28px;
+  background: var(--dorado);
+  border-radius: 0 3px 3px 0;
+}
+.sidebar-nav li a::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px); top: 50%;
+  transform: translateY(-50%);
+  background: var(--texto);
+  color: var(--dorado);
+  font-size: 11px; font-weight: 500;
+  padding: 5px 10px; border-radius: 8px;
+  white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity 0.15s;
+  border: 1px solid rgba(201,168,76,0.2);
+}
+.sidebar-nav li a:hover::after { opacity: 1; }
+.sidebar-footer { flex-shrink: 0; }
+.btn-logout {
+  width: 46px; height: 46px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; border-radius: var(--radio);
+  color: rgba(255,255,255,0.25); cursor: pointer;
+  transition: all 0.2s; position: relative;
+}
+.btn-logout svg { width: 20px; height: 20px; }
+.btn-logout:hover { color: var(--error); background: rgba(229,57,53,0.1); }
+.btn-logout::after {
+  content: 'Salir';
+  position: absolute; left: calc(100% + 10px); top: 50%;
+  transform: translateY(-50%);
+  background: var(--texto); color: var(--error);
+  font-size: 11px; font-weight: 500;
+  padding: 5px 10px; border-radius: 8px;
+  white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity 0.15s;
+  border: 1px solid rgba(229,57,53,0.2);
+}
+.btn-logout:hover::after { opacity: 1; }
 
-    .proximas-panel {
-      background: var(--blanco);
-      border: 1px solid var(--detalle);
-      border-radius: var(--radio-lg);
-      overflow: hidden;
-      align-self: start;
-    }
-    .proximas-header {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--detalle);
-    }
-    .proximas-titulo { font-family: var(--serif); font-size: 18px; font-weight: 300; }
-    .proximas-titulo em { font-style: italic; color: var(--dorado); }
-    .proxima-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px; transition: background 0.15s;
-      border-bottom: 1px solid var(--detalle);
-    }
-    .proxima-item:last-child { border-bottom: none; }
-    .proxima-item:hover { background: var(--fondo); }
-    .proxima-dia {
-      font-family: var(--serif); font-size: 22px; font-weight: 300;
-      color: var(--dorado); min-width: 30px; text-align: center;
-    }
-    .proxima-info { flex: 1; min-width: 0; }
-    .proxima-nombre { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .proxima-detalle { font-size: 11px; color: var(--texto-suave); }
+/* ══ MAIN ══ */
+.main-wrap { margin-left: var(--sidebar-w); min-height: 100vh; }
+.main { padding: 28px 28px; }
 
-    @media (max-width: 680px) {
-      body { display: block; }
-      .resumen-grid { grid-template-columns: 1fr 1fr; }
-      .citas-wrap { grid-template-columns: 1fr; }
-      .proximas-panel { display: none; }
-      .cita-card { grid-template-columns: 50px 1fr; }
-      .cita-acciones { flex-direction: row; margin-top: 8px; grid-column: 1 / -1; }
-    }
-  </style>
-</head>
-<body>
+/* ══ BOTTOM NAV mobile ══ */
+.bottom-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: var(--bottom-h);
+  background: var(--texto);
+  z-index: 100;
+  justify-content: space-around;
+  align-items: center;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.bottom-nav a {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+  color: rgba(255,255,255,0.35);
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 6px 20px; border-radius: var(--radio);
+  transition: color 0.2s;
+}
+.bottom-nav a svg { width: 22px; height: 22px; }
+.bottom-nav a.activo { color: var(--dorado); }
 
-  <!-- Sidebar íconos -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <img src="https://raw.githubusercontent.com/petitspaapp/petit-spa/main/petitspa-logo.png" alt="Petit Spa" />
-    </div>
-    <ul class="sidebar-nav">
-      <li>
-        <a href="dashboard.html" class="activo" data-tooltip="Dashboard">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        </a>
-      </li>
-      <li>
-        <a href="calendario.html" data-tooltip="Calendario">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        </a>
-      </li>
-      <li>
-        <a href="servicios.html" data-tooltip="Servicios">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        </a>
-      </li>
-    </ul>
-    <div class="sidebar-footer">
-      <button class="btn-logout" id="btn-logout">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      </button>
-    </div>
-  </aside>
+/* ══ TIPOGRAFÍA ══ */
+.titulo-pagina {
+  font-family: var(--serif);
+  font-size: 28px; font-weight: 600;
+  color: var(--texto); line-height: 1.1;
+}
+.titulo-pagina span { color: var(--dorado); font-style: italic; }
+.subtitulo { font-size: 13px; color: var(--texto-2); margin-top: 3px; }
 
-  <!-- Bottom nav mobile -->
-  <nav class="bottom-nav">
-    <a href="dashboard.html" class="activo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Inicio
-    </a>
-    <a href="calendario.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-      Citas
-    </a>
-    <a href="servicios.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      Servicios
-    </a>
-  </nav>
+/* ══ CARDS ══ */
+.card {
+  background: var(--blanco);
+  border-radius: var(--radio-lg);
+  padding: 20px;
+  border: none;
+}
+.card-dorada {
+  background: linear-gradient(135deg, var(--texto) 0%, #2d2820 100%);
+  border-radius: var(--radio-lg);
+  padding: 22px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.card-dorada::before {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(201,168,76,0.25) 0%, transparent 70%);
+  border-radius: 50%;
+}
 
-  <div class="main-wrap">
-    <div class="main">
+/* ══ BOTONES ══ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 7px; font-family: var(--sans); font-size: 13px; font-weight: 600;
+  padding: 0 22px; height: 42px; border: none;
+  border-radius: 999px; cursor: pointer;
+  transition: all 0.2s; white-space: nowrap; letter-spacing: 0.02em;
+}
+.btn svg { width: 15px; height: 15px; }
+.btn-dorado { background: var(--dorado); color: var(--blanco); }
+.btn-dorado:hover { background: var(--dorado-osc); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,168,76,0.4); }
+.btn-outline { background: transparent; color: var(--texto); border: 1.5px solid var(--borde); }
+.btn-outline:hover { border-color: var(--dorado); color: var(--dorado); }
+.btn-ghost { background: transparent; color: var(--dorado); }
+.btn-ghost:hover { background: var(--dorado-bg); }
+.btn-peligro { background: transparent; color: var(--error); border: 1.5px solid rgba(229,57,53,0.2); }
+.btn-peligro:hover { background: rgba(229,57,53,0.05); }
+.btn-icono {
+  width: 40px; height: 40px; padding: 0;
+  background: var(--dorado-bg); color: var(--dorado);
+  border: none; border-radius: var(--radio);
+  cursor: pointer; display: inline-flex;
+  align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.btn-icono:hover { background: var(--dorado); color: var(--blanco); }
+.btn-icono svg { width: 17px; height: 17px; }
 
-      <div class="page-header">
-        <h1 class="page-titulo" id="fecha-titulo">Citas de <em>hoy</em></h1>
-      </div>
+/* ══ INPUTS ══ */
+.input {
+  background: var(--fondo);
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 12px 16px;
+  font-family: var(--sans);
+  font-size: 14px; font-weight: 400;
+  color: var(--texto); outline: none;
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input:focus { border-color: var(--dorado); background: var(--blanco); box-shadow: 0 0 0 3px rgba(201,168,76,0.08); }
+.input::placeholder { color: var(--texto-3); }
+select.input { cursor: pointer; }
+textarea.input { resize: vertical; min-height: 90px; }
 
-      <!-- Resumen -->
-      <div class="resumen-grid">
-        <div class="resumen-card">
-          <div class="resumen-label">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-            Total hoy
-          </div>
-          <div class="resumen-numero" id="total-hoy">—</div>
-          <div class="resumen-sub">citas programadas</div>
-        </div>
-        <div class="resumen-card">
-          <div class="resumen-label">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2 2"/></svg>
-            Pendientes
-          </div>
-          <div class="resumen-numero" id="total-pendientes">—</div>
-          <div class="resumen-sub">por confirmar</div>
-        </div>
-        <div class="resumen-card">
-          <div class="resumen-label">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Confirmadas
-          </div>
-          <div class="resumen-numero" id="total-confirmadas">—</div>
-          <div class="resumen-sub">listas para atender</div>
-        </div>
-      </div>
+/* ══ FORM ══ */
+.label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--texto-2); display: block; margin-bottom: 6px; }
+.field { display: flex; flex-direction: column; }
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field.full { grid-column: 1 / -1; }
 
-      <div class="citas-wrap">
-        <div class="citas-lista" id="citas-lista">
-          <div class="empty-state">
-            <div class="empty-state-icono">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-            </div>
-            <p>Sin citas hoy</p>
-            <span>No hay citas programadas para hoy</span>
-          </div>
-        </div>
-        <div class="proximas-panel">
-          <div class="proximas-header">
-            <div class="proximas-titulo">Próximas <em>citas</em></div>
-          </div>
-          <div id="proximas-lista">
-            <div style="padding:30px 16px;text-align:center">
-              <span style="font-size:12px;color:var(--texto-suave)">Sin próximas citas</span>
-            </div>
-          </div>
-        </div>
-      </div>
+/* ══ BADGES ══ */
+.badge {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 600;
+  padding: 4px 12px; border-radius: 999px;
+  letter-spacing: 0.03em;
+}
+.badge-pendiente  { background: rgba(230,81,0,0.1);  color: var(--pendiente); }
+.badge-confirmada { background: rgba(46,125,50,0.1);  color: var(--exito); }
+.badge-cancelada  { background: rgba(229,57,53,0.1);  color: var(--error); }
+.badge-activo     { background: var(--dorado-bg);     color: var(--dorado-osc); }
 
-    </div>
-  </div>
+/* ══ TOAST ══ */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--texto); color: white;
+  font-size: 13px; font-weight: 500;
+  padding: 14px 20px; border-radius: var(--radio);
+  z-index: 500; transform: translateY(70px); opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  border-left: 3px solid var(--dorado);
+  display: flex; align-items: center; gap: 8px;
+}
+.toast.visible { transform: translateY(0); opacity: 1; }
 
-  <div class="toast" id="toast"></div>
+/* ══ MODAL ══ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(26,24,20,0.6);
+  backdrop-filter: blur(8px);
+  z-index: 300; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.visible { display: flex; }
+.modal {
+  background: var(--blanco);
+  border-radius: var(--radio-xl);
+  width: 100%; max-width: 480px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 24px 24px 0; margin-bottom: 20px;
+}
+.modal-titulo { font-family: var(--serif); font-size: 24px; font-weight: 600; }
+.modal-titulo span { color: var(--dorado); font-style: italic; }
+.btn-cerrar {
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  background: var(--fondo); border: none; border-radius: 50%; cursor: pointer;
+  color: var(--texto-2); transition: all 0.15s;
+}
+.btn-cerrar:hover { background: var(--borde); color: var(--texto); }
+.btn-cerrar svg { width: 16px; height: 16px; }
+.modal-body { padding: 0 24px 24px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--borde); }
 
-  <script type="module">
-    import { supabase, toast } from '../supabase.js';
+/* ══ EMPTY STATE ══ */
+.empty-state { text-align: center; padding: 60px 24px; }
+.empty-state-icon {
+  width: 60px; height: 60px; background: var(--dorado-bg);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+}
+.empty-state-icon svg { width: 26px; height: 26px; color: var(--dorado); }
+.empty-state h3 { font-family: var(--serif); font-size: 20px; font-weight: 600; color: var(--texto); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; color: var(--texto-2); }
 
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) window.location.href = 'login.html';
+/* ══ TABLA ══ */
+.tabla-wrap { background: var(--blanco); border-radius: var(--radio-lg); overflow: hidden; }
+.tabla { width: 100%; border-collapse: collapse; }
+.tabla th { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--texto-2); padding: 14px 18px; text-align: left; background: var(--fondo); border-bottom: 1px solid var(--borde); }
+.tabla td { padding: 14px 18px; border-bottom: 1px solid var(--borde); font-size: 13px; }
+.tabla tr:last-child td { border-bottom: none; }
+.tabla tr:hover td { background: #FAFAF8; }
 
-    document.getElementById('btn-logout').addEventListener('click', async () => {
-      await supabase.auth.signOut();
-      window.location.href = 'login.html';
-    });
-
-    const hoy = new Date();
-    const hoyStr = hoy.toISOString().split('T')[0];
-    const DIAS  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-    const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-
-    document.getElementById('fecha-titulo').innerHTML =
-      `Citas del <em>${DIAS[hoy.getDay()]} ${hoy.getDate()} de ${MESES[hoy.getMonth()]}</em>`;
-
-    const { data: servicios } = await supabase.from('servicios').select('id, nombre');
-    const mapaServ = {};
-    (servicios || []).forEach(s => { mapaServ[s.id] = s.nombre; });
-
-    async function cargarCitas() {
-      const { data } = await supabase
-        .from('citas').select('*')
-        .eq('fecha', hoyStr)
-        .order('hora', { ascending: true });
-
-      const citas = data || [];
-      document.getElementById('total-hoy').textContent        = citas.length;
-      document.getElementById('total-pendientes').textContent  = citas.filter(c => c.estado === 'pendiente').length;
-      document.getElementById('total-confirmadas').textContent = citas.filter(c => c.estado === 'confirmada').length;
-
-      const lista = document.getElementById('citas-lista');
-      if (citas.length === 0) {
-        lista.innerHTML = `<div class="empty-state">
-          <div class="empty-state-icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
-          <p>Sin citas hoy</p><span>No hay citas programadas para hoy</span></div>`;
-        return;
-      }
-
-      lista.innerHTML = citas.map(c => `
-        <div class="cita-card">
-          <div class="cita-hora-box">
-            <div class="cita-hora">${(c.hora||'').substring(0,5)}</div>
-            <div class="cita-hora-sub">hrs</div>
-          </div>
-          <div class="cita-info">
-            <h3>${c.cliente_nombre||'—'}</h3>
-            <div class="cita-info-sub">${mapaServ[c.servicio_id]||'—'} · ${c.cliente_telefono||'—'}</div>
-            <span class="badge badge-${c.estado}">${c.estado}</span>
-          </div>
-          <div class="cita-acciones">
-            ${c.estado === 'pendiente' ? `<button class="btn-conf" data-id="${c.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Confirmar</button>` : ''}
-            ${c.estado !== 'cancelada' ? `<button class="btn-canc" data-id="${c.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>Cancelar</button>` : ''}
-          </div>
-        </div>`).join('');
-
-      lista.querySelectorAll('.btn-conf').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          await supabase.from('citas').update({ estado: 'confirmada' }).eq('id', btn.dataset.id);
-          toast('Cita confirmada ✓');
-          cargarCitas();
-        });
-      });
-      lista.querySelectorAll('.btn-canc').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          if (!confirm('¿Cancelar esta cita?')) return;
-          await supabase.from('citas').update({ estado: 'cancelada' }).eq('id', btn.dataset.id);
-          toast('Cita cancelada');
-          cargarCitas();
-        });
-      });
-    }
-
-    async function cargarProximas() {
-      const en7 = new Date(hoy);
-      en7.setDate(en7.getDate() + 7);
-      const { data } = await supabase.from('citas').select('*')
-        .gt('fecha', hoyStr)
-        .lte('fecha', en7.toISOString().split('T')[0])
-        .in('estado', ['pendiente','confirmada'])
-        .order('fecha').order('hora').limit(8);
-
-      const contenedor = document.getElementById('proximas-lista');
-      if (!data || data.length === 0) {
-        contenedor.innerHTML = `<div style="padding:30px 16px;text-align:center"><span style="font-size:12px;color:var(--texto-suave)">Sin próximas citas</span></div>`;
-        return;
-      }
-      contenedor.innerHTML = data.map(c => {
-        const f = new Date(c.fecha + 'T12:00:00');
-        return `<div class="proxima-item">
-          <div class="proxima-dia">${f.getDate()}</div>
-          <div class="proxima-info">
-            <div class="proxima-nombre">${c.cliente_nombre||'—'}</div>
-            <div class="proxima-detalle">${MESES[f.getMonth()].substring(0,3)} · ${(c.hora||'').substring(0,5)} · ${mapaServ[c.servicio_id]||'—'}</div>
-          </div>
-          <span class="badge badge-${c.estado}">${c.estado === 'confirmada' ? 'conf.' : 'pend.'}</span>
-        </div>`;
-      }).join('');
-    }
-
-    cargarCitas();
-    cargarProximas();
-
-    supabase.channel('dashboard')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'citas' }, () => {
-        cargarCitas(); cargarProximas();
-      }).subscribe();
-  </script>
-</body>
-</html>
+/* ══ MOBILE ══ */
+@media (max-width: 680px) {
+  .sidebar { display: none; }
+  .bottom-nav { display: flex; }
+  .main-wrap { margin-left: 0; padding-bottom: var(--bottom-h); }
+  .main { padding: 20px 16px; }
+  .input { font-size: 16px; }
+  .field-grid { grid-template-columns: 1fr; }
+  .field.full { grid-column: 1; }
+  .modal { border-radius: var(--radio-xl) var(--radio-xl) 0 0; }
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .toast { right: 16px; left: 16px; bottom: calc(var(--bottom-h) + 12px); }
+}
